@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 export default function Employees() {
+  const [search, setSearch] = useState("");
+
   const [employees, setEmployees] = useState([
     {
       id: 1,
@@ -20,23 +22,16 @@ export default function Employees() {
     status: "Ativo"
   });
 
-  function handleChange(e) {
+  const [editingId, setEditingId] = useState(null);
+
+  const handleChange = (e) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value
     });
-  }
+  };
 
-  function handleSubmit(e) {
-    e.preventDefault();
-
-    const novoFuncionario = {
-      id: Date.now(),
-      ...form
-    };
-
-    setEmployees([...employees, novoFuncionario]);
-
+  const limparFormulario = () => {
     setForm({
       nome: "",
       email: "",
@@ -44,99 +39,238 @@ export default function Employees() {
       telefone: "",
       status: "Ativo"
     });
-  }
 
-  function deleteEmployee(id) {
-    setEmployees(
-      employees.filter((item) => item.id !== id)
+    setEditingId(null);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (editingId) {
+      setEmployees(
+        employees.map((employee) =>
+          employee.id === editingId
+            ? { ...employee, ...form }
+            : employee
+        )
+      );
+    } else {
+      const novoFuncionario = {
+        id: Date.now(),
+        ...form
+      };
+
+      setEmployees([...employees, novoFuncionario]);
+    }
+
+    limparFormulario();
+  };
+
+  const handleEdit = (employee) => {
+    setEditingId(employee.id);
+
+    setForm({
+      nome: employee.nome,
+      email: employee.email,
+      cargo: employee.cargo,
+      telefone: employee.telefone,
+      status: employee.status
+    });
+  };
+
+  const handleDelete = (id) => {
+    const confirmar = window.confirm(
+      "Deseja realmente excluir este funcionário?"
     );
-  }
+
+    if (!confirmar) return;
+
+    setEmployees(
+      employees.filter(
+        (employee) => employee.id !== id
+      )
+    );
+  };
+
+  const filteredEmployees = employees.filter(
+    (employee) =>
+      employee.nome
+        .toLowerCase()
+        .includes(search.toLowerCase())
+  );
 
   return (
-    <div className="container">
-      <h1>Gerenciamento de Funcionários</h1>
+    <div style={{ padding: "20px" }}>
+      <h1>Funcionários</h1>
 
-      <form onSubmit={handleSubmit}>
+      <div
+        style={{
+          background: "#fff",
+          padding: "20px",
+          borderRadius: "10px",
+          marginBottom: "20px"
+        }}
+      >
+        <h3>
+          {editingId
+            ? "Editar Funcionário"
+            : "Novo Funcionário"}
+        </h3>
+
+        <form onSubmit={handleSubmit}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(auto-fit,minmax(250px,1fr))",
+              gap: "10px"
+            }}
+          >
+            <input
+              type="text"
+              name="nome"
+              placeholder="Nome"
+              value={form.nome}
+              onChange={handleChange}
+              required
+            />
+
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+
+            <input
+              type="text"
+              name="cargo"
+              placeholder="Cargo"
+              value={form.cargo}
+              onChange={handleChange}
+              required
+            />
+
+            <input
+              type="text"
+              name="telefone"
+              placeholder="Telefone"
+              value={form.telefone}
+              onChange={handleChange}
+              required
+            />
+
+            <select
+              name="status"
+              value={form.status}
+              onChange={handleChange}
+            >
+              <option>Ativo</option>
+              <option>Inativo</option>
+            </select>
+          </div>
+
+          <div
+            style={{
+              marginTop: "15px",
+              display: "flex",
+              gap: "10px"
+            }}
+          >
+            <button type="submit">
+              {editingId
+                ? "Atualizar"
+                : "Cadastrar"}
+            </button>
+
+            <button
+              type="button"
+              onClick={limparFormulario}
+            >
+              Limpar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div
+        style={{
+          background: "#fff",
+          padding: "20px",
+          borderRadius: "10px"
+        }}
+      >
         <input
-          name="nome"
-          placeholder="Nome"
-          value={form.nome}
-          onChange={handleChange}
-          required
+          type="text"
+          placeholder="Pesquisar funcionário..."
+          value={search}
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
+          style={{
+            width: "100%",
+            padding: "10px",
+            marginBottom: "20px"
+          }}
         />
 
-        <input
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
-
-        <input
-          name="cargo"
-          placeholder="Cargo"
-          value={form.cargo}
-          onChange={handleChange}
-          required
-        />
-
-        <input
-          name="telefone"
-          placeholder="Telefone"
-          value={form.telefone}
-          onChange={handleChange}
-          required
-        />
-
-        <select
-          name="status"
-          value={form.status}
-          onChange={handleChange}
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse"
+          }}
         >
-          <option value="Ativo">Ativo</option>
-          <option value="Inativo">Inativo</option>
-        </select>
-
-        <button type="submit">
-          Adicionar Funcionário
-        </button>
-      </form>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Email</th>
-            <th>Cargo</th>
-            <th>Telefone</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {employees.map((employee) => (
-            <tr key={employee.id}>
-              <td>{employee.nome}</td>
-              <td>{employee.email}</td>
-              <td>{employee.cargo}</td>
-              <td>{employee.telefone}</td>
-              <td>{employee.status}</td>
-
-              <td>
-                <button
-                  onClick={() =>
-                    deleteEmployee(employee.id)
-                  }
-                >
-                  Excluir
-                </button>
-              </td>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Cargo</th>
+              <th>Telefone</th>
+              <th>Status</th>
+              <th>Ações</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {filteredEmployees.map(
+              (employee) => (
+                <tr key={employee.id}>
+                  <td>{employee.nome}</td>
+                  <td>{employee.email}</td>
+                  <td>{employee.cargo}</td>
+                  <td>{employee.telefone}</td>
+                  <td>{employee.status}</td>
+
+                  <td>
+                    <button
+                      onClick={() =>
+                        handleEdit(employee)
+                      }
+                    >
+                      Editar
+                    </button>
+
+                    <button
+                      style={{
+                        marginLeft: "10px"
+                      }}
+                      onClick={() =>
+                        handleDelete(
+                          employee.id
+                        )
+                      }
+                    >
+                      Excluir
+                    </button>
+                  </td>
+                </tr>
+              )
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

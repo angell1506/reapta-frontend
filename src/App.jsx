@@ -11,6 +11,7 @@ import RotaProtegida from './components/RotaProtegida';
 import Sales from './pages/Sales';
 import NewSales from './pages/NewSales';
 import Products from './pages/Products';
+import Employees from "./pages/Employees";
 //import NewProduct from './pages/NewProduct';
 import Reports from './pages/Reports';
 import IntelligentAssistant from './pages/IntelligentAssistant';
@@ -33,6 +34,7 @@ function App() {
         <Route path="/sales" element={<RotaProtegida><Layout><Sales /></Layout></RotaProtegida>} />
         <Route path="/new-sale" element={<RotaProtegida><Layout><NewSales /></Layout></RotaProtegida>} />
         <Route path="/products" element={<RotaProtegida><Layout><Products /></Layout></RotaProtegida>} />
+        <Route path="/employees" element={<RotaProtegida><Layout><Employees /></Layout></RotaProtegida>}/>
         {/* <Route path="/new-product" element={<RotaProtegida><Layout><NewProduct /></Layout></RotaProtegida>} /> */}
         <Route path="/reports" element={<RotaProtegida><Layout><Reports /></Layout></RotaProtegida>} />
         <Route path="/assistant" element={

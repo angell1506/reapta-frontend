@@ -7,6 +7,7 @@ const MENU = [
   { path: '/dashboard', label: 'Dashboard' },
   { path: '/sales',     label: 'Vendas' },
   { path: '/products',  label: 'Produtos' },
+  { path: '/employees', label: 'Funcionários' },
   { path: '/reports',   label: 'Relatórios' },
   { path: '/assistant', label: 'Assistente' },
 ];
